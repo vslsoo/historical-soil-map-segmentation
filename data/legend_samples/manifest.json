@@ -1,0 +1,62 @@
+[
+  {
+    "file": "class_10_03.png",
+    "category": "class_10",
+    "bbox_full_res": [
+      4529,
+      19650,
+      4732,
+      19747
+    ]
+  },
+  {
+    "file": "class_12_01.png",
+    "category": "class_12",
+    "bbox_full_res": [
+      4519,
+      20336,
+      4713,
+      20433
+    ]
+  },
+  {
+    "file": "class_13_01.png",
+    "category": "class_13",
+    "bbox_full_res": [
+      4501,
+      20674,
+      4701,
+      20773
+    ]
+  },
+  {
+    "file": "test_area_10_01.png",
+    "category": "test_area_10",
+    "bbox_full_res": [
+      7178,
+      13067,
+      7817,
+      13798
+    ]
+  },
+  {
+    "file": "test_area_12_01.png",
+    "category": "test_area_12",
+    "bbox_full_res": [
+      8692,
+      12211,
+      9449,
+      12875
+    ]
+  },
+  {
+    "file": "test_area_13_01.png",
+    "category": "test_area_13",
+    "bbox_full_res": [
+      5436,
+      15640,
+      6097,
+      16315
+    ]
+  }
+]

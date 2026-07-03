@@ -1,0 +1,13 @@
+numpy
+opencv-python
+scikit-image
+matplotlib
+rasterio
+geopandas
+shapely
+segment-anything
+torch
+torchvision
+segmentation-models-pytorch
+pillow
+scipy

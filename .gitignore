@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
+
+data/raw/
+output/
+data/labels/patches*.npz
+*.gpkg-shm
+*.gpkg-wal
+
+*.tif
+*.tiff
