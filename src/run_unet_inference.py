@@ -97,6 +97,10 @@ def main():
                          help="Disk-shaped morphological opening per class to trim ragged spillover at boundaries. 0 disables it.")
     parser.add_argument("--min-object-size", type=int, default=0, help="Drop connected blobs smaller than this many px. 0 disables it.")
     parser.add_argument("--min-hole-size", type=int, default=0, help="Fill holes smaller than this many px inside a blob. 0 disables it.")
+    parser.add_argument("--tta", action="store_true",
+                         help="Average softmax probabilities over horizontal/vertical flips of each tile (test-time augmentation). "
+                              "~4x slower but usually gives more confident, stable predictions with fewer low-confidence holes, "
+                              "without any retraining.")
     parser.add_argument("--vectorize", action="store_true")
     parser.add_argument("--smooth-tolerance", type=float, default=0.0,
                          help="Rounds off the pixel-grid 'staircase' edges left by vectorizing a raster, in map units (meters here). "
@@ -172,9 +176,25 @@ def main():
 
                 tensor = torch.from_numpy(padded.astype(np.float32) / 255.0).permute(2, 0, 1).unsqueeze(0).to(device)
                 with torch.no_grad():
-                    logits = model(tensor)
-                    logits[:, 1:] += fg_bias_tensor
-                    probs = torch.softmax(logits, dim=1).squeeze(0).cpu().numpy()
+                    if args.tta:
+                        # average softmax over the original + horizontal/vertical/both flips --
+                        # a model that's genuinely confident agrees with itself across these views,
+                        # so averaging smooths out the low-confidence wobble that leaves holes,
+                        # without touching training at all
+                        views = [tensor, tensor.flip(-1), tensor.flip(-2), tensor.flip(-1).flip(-2)]
+                        probs_sum = None
+                        for view, flip_dims in zip(views, [(), (-1,), (-2,), (-1, -2)]):
+                            logits = model(view)
+                            logits[:, 1:] += fg_bias_tensor
+                            p = torch.softmax(logits, dim=1)
+                            for d in flip_dims:
+                                p = p.flip(d)
+                            probs_sum = p if probs_sum is None else probs_sum + p
+                        probs = (probs_sum / len(views)).squeeze(0).cpu().numpy()
+                    else:
+                        logits = model(tensor)
+                        logits[:, 1:] += fg_bias_tensor
+                        probs = torch.softmax(logits, dim=1).squeeze(0).cpu().numpy()
                 probs = probs[:, :orig_h, :orig_w]
 
                 oh, ow = row_off // args.downsample, col_off // args.downsample
